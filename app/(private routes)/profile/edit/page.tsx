@@ -7,19 +7,22 @@ import { isAxiosError } from "axios";
 
 import { getMe, updateProfile } from "@/lib/api/clientApi";
 import type { User } from "@/types/user";
+import { useAuthStore } from "@/lib/store/authStore";
 import css from "./EditProfilePage.module.css";
 
 export default function EditProfile() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  const setUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const data = await getMe();
         if (data) {
-          setUser(data);
+          setUserState(data);
         }
       } catch (err) {
         console.error("Failed to fetch user:", err);
@@ -55,17 +58,23 @@ export default function EditProfile() {
     }
 
     try {
-      await updateProfile({ email: user.email, username });
+      const updatedUser = await updateProfile({
+        email: user.email,
+        username,
+      });
+      
+      setUser(updatedUser);
+
       router.push("/profile");
     } catch (err) {
       if (isAxiosError(err) && err.response?.data?.message) {
         setError(err.response.data.message as string);
       } else {
-        setError("An unexpected error occurred");
+        setError("An unexpected error occurred")
       }
     }
   };
-
+  
   return (
     <main className={css.mainContent}>
       <div className={css.profileCard}>

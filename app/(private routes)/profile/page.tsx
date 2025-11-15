@@ -54,12 +54,6 @@ export default async function Profile() {
           <p>Username: {user?.username}</p>
           <p>Email: {user?.email}</p>
         </div>
-
-        <div className={css.actions}>
-          <Link href="/notes/filter/all" className={css.notesButton}>
-            Go to my notes
-          </Link>
-        </div>
       </div>
     </main>
   );

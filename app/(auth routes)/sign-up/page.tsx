@@ -26,7 +26,7 @@ export default function Register() {
 
       if (user) {
         setUser(user);
-        router.push("/notes/filter/all");
+        router.push("/profile");
       } else {
         setError("Registration failed");
       }

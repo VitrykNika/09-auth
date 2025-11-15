@@ -8,13 +8,14 @@ import { Metadata } from "next";
 import { IMG_URL, SITE_URL } from "@/lib/constants";
 import { fetchNoteById } from "@/lib/api/serverApi";
 
-interface NoteDetailsPageProps {
-  params: { id: string };
-}
+type NoteDetailsPageProps = {
+  params: Promise<{ id: string }>;
+};
+
 export async function generateMetadata({
   params,
 }: NoteDetailsPageProps): Promise<Metadata> {
-  const { id } = params;
+  const { id } = await params;
   const data = await fetchNoteById(id);
 
   return {
@@ -40,9 +41,8 @@ export async function generateMetadata({
 export default async function NoteDetailsPage({
   params,
 }: NoteDetailsPageProps) {
+  const { id } = await params;
   const queryClient = new QueryClient();
-  const { id } = params;
-
   await queryClient.prefetchQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),

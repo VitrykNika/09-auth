@@ -3,7 +3,6 @@
 import type { FormValues, Note } from "@/types/note";
 import type { RegisterLoginData, User } from "@/types/user";
 import { nextServer, type NotesHttpResponse } from "./api";
-import axios from "axios";
 
 export const fetchNotes = async (
   topic: string,
@@ -65,29 +64,34 @@ export const checkSession = async (): Promise<User | null> => {
   return null;
 };
 
-
-interface EditProfile {
-  email: string;
-  username: string;
-}
-
-export const updateMe = async (editUser: EditProfile): Promise<User> => {
+export const updateMe = async (
+  editUser: Pick<User, "email" | "username">
+): Promise<User> => {
   const { data } = await nextServer.patch<User>("/users/me", editUser);
   return data;
 };
 
 export async function getMe(): Promise<User | null> {
-  const res = await axios.get("/api/users/me");
-  return res.data ?? null;
+  try {
+    const res = await nextServer.get<User | "">("/users/me");
+    if (res.data && typeof res.data === "object") {
+      return res.data as User;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getSession(): Promise<{ success: boolean }> {
-  const res = await axios.get("/api/auth/session");
-  return res.data;
+  const { data } = await nextServer.get<{ success: boolean }>(
+    "/auth/session"
+  );
+  return data;
 }
 
 export async function logoutRequest(): Promise<void> {
-  await axios.post("/api/auth/logout");
+  await nextServer.post("/auth/logout");
 }
 
 export const updateProfile = updateMe;
