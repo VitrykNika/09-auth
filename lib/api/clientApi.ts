@@ -4,7 +4,6 @@ import type { FormValues, Note } from "@/types/note";
 import type { RegisterLoginData, User } from "@/types/user";
 import { nextServer, type NotesHttpResponse } from "./api";
 import axios from "axios";
-// -------- Notes --------
 
 export const fetchNotes = async (
   topic: string,
@@ -41,8 +40,6 @@ export const deleteNote = async (id: string): Promise<Note> => {
   return response.data;
 };
 
-// -------- Auth --------
-
 export const register = async (
   registerData: RegisterLoginData
 ): Promise<User> => {
@@ -59,23 +56,15 @@ export const logout = async (): Promise<void> => {
   await nextServer.post("/auth/logout");
 };
 
-/**
- * checkSession повертає або User, або null.
- * /api/auth/session (з api-папки ДЗ) якраз це й дозволяє.
- */
 export const checkSession = async (): Promise<User | null> => {
   const res = await nextServer.get<User | "">("/auth/session");
 
-  // якщо користувач авторизований — бекенд повертає об'єкт користувача
   if (res.data && typeof res.data === "object") {
     return res.data as User;
   }
-
-  // якщо не авторизований — пусто
   return null;
 };
 
-// -------- User profile --------
 
 interface EditProfile {
   email: string;
@@ -101,5 +90,4 @@ export async function logoutRequest(): Promise<void> {
   await axios.post("/api/auth/logout");
 }
 
-// Якщо десь у коді вже використовується updateProfile — можна залишити аліас:
 export const updateProfile = updateMe;

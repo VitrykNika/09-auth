@@ -67,6 +67,16 @@ export default function AuthNavigation() {
         </Link>
       </li>
       <li className={css.navigationItem}>
+  <Link
+    href="/notes/filter/all"
+    prefetch={false}
+    aria-current={isActive("/notes/filter/all")}
+    className={css.navigationLink}
+  >
+    Notes
+  </Link>
+</li>
+      <li className={css.navigationItem}>
         <p className={css.userEmail}>{user?.email}</p>
         <button
           type="button"

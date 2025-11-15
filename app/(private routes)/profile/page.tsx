@@ -1,19 +1,19 @@
-
 import Link from "next/link";
-import css from "./ProfilePage.module.css"
-import Image from 'next/image';
+import css from "./ProfilePage.module.css";
+import Image from "next/image";
 import { IMG_URL, SITE_URL } from "@/lib/constants";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { getMe } from "@/lib/api/serverApi";
 
 export const metadata: Metadata = {
   title: "User Profile | NoteHub",
-  description: "View and manage your NoteHub profile. Update personal details, view account information, and manage your notes in one place.",
+  description:
+    "View and manage your NoteHub profile. Update personal details, view account information, and manage your notes in one place.",
   openGraph: {
     title: "User Profile | NoteHub",
     description:
       "Manage your NoteHub account settings and profile information. Stay organized and productive with NoteHub.",
-    url: SITE_URL+"/profile",
+    url: SITE_URL + "/profile",
     images: [
       {
         url: IMG_URL,
@@ -37,6 +37,7 @@ export default async function Profile() {
             Edit Profile
           </Link>
         </div>
+
         <div className={css.avatarWrapper}>
           {user?.avatar && (
             <Image
@@ -48,9 +49,16 @@ export default async function Profile() {
             />
           )}
         </div>
+
         <div className={css.profileInfo}>
           <p>Username: {user?.username}</p>
           <p>Email: {user?.email}</p>
+        </div>
+
+        <div className={css.actions}>
+          <Link href="/notes/filter/all" className={css.notesButton}>
+            Go to my notes
+          </Link>
         </div>
       </div>
     </main>

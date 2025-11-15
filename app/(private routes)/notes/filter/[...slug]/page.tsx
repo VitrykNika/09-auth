@@ -5,46 +5,52 @@ import {
 } from "@tanstack/react-query";
 import NotesClient from "./Notes.client";
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { IMG_URL, SITE_URL } from "@/lib/constants";
 import { fetchNotes } from "@/lib/api/serverApi";
 
-interface NotePageProps {
-  params: { slug: string[] };
-}
-export async function generateMetadata({
-  params,
-}: NotePageProps): Promise<Metadata> {
-  const { slug } = params;
+type PageProps = {
+  params: Promise<{ slug: string[] }>;
+  searchParams: { page?: string };
+};
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const { slug } = await params;
   const category = slug[0] === "all" ? undefined : slug[0];
+  const title = category ?? "All notes";
 
   return {
-    title: category,
-    description: `Explore the best notes in the "${category}" category on NoteHub.`,
+    title,
+    description: `Explore the best notes in the "${category ?? "all"}" category on NoteHub.`,
     openGraph: {
-      title: category,
-      description: `Explore the best notes in the "${category}" category on NoteHub.`,
+      title,
+      description: `Explore the best notes in the "${category ?? "all"}" category on NoteHub.`,
       url: `${SITE_URL}/notes/filter/${slug[0]}`,
-      siteName: 'NoteHub',
+      siteName: "NoteHub",
       images: [
         {
           url: IMG_URL,
           width: 1200,
           height: 630,
-          alt: 'NoteHub',
+          alt: "NoteHub",
         },
-      ]
-    }
-  }
+      ],
+    },
+  };
 }
-export default async function NotePage({ params }: NotePageProps) {
-  const { slug } = params;
+
+export default async function NotePage({ params, searchParams }: PageProps) {
+  const { slug } = await params;
+
+  const category = slug[0] === "all" ? undefined : slug[0];
+  const page = Number(searchParams.page ?? "1");
 
   const queryClient = new QueryClient();
-  const category = slug[0] === "all" ? undefined : slug[0];
+
   await queryClient.prefetchQuery({
-    queryKey: ["notes", { search: "", tag: category, page: 1 }],
-    queryFn: () => fetchNotes("", 1, category),
+    queryKey: ["notes", { search: "", tag: category, page }],
+    queryFn: () => fetchNotes("", page, category),
   });
 
   return (

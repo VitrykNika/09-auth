@@ -5,7 +5,7 @@ import type { NoteTag } from "@/types/note";
 export type NoteDraft = {
   title: string;
   content: string;
-  tag: NoteTag; // "Work" | "Personal" | "Meeting" | "Shopping" | "Todo"
+  tag: NoteTag;
 };
 
 export const initialDraft: NoteDraft = {
@@ -30,9 +30,7 @@ export const useNoteStore = create<NoteStore>()(
     }),
     {
       name: "notehub_draft_v1",
-      // SSR-safe: модуль використовуй лише у клієнтських компонентах
       storage: createJSONStorage(() => localStorage),
-      // optionally зберігаємо ТІЛЬКИ draft:
       partialize: (state) => ({ draft: state.draft }),
     }
   )
