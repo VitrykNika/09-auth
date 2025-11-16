@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/lib/store/authStore";
-import { logout } from "@/lib/api/clientApi";
+import { logout, getMe } from "@/lib/api/clientApi";
 import css from "./AuthNavigation.module.css";
 
 export default function AuthNavigation() {
@@ -16,16 +17,29 @@ export default function AuthNavigation() {
     (state) => state.clearIsAuthenticated
   );
 
-  async function handleLogout() {
-    try {
-      await logout();
-    } finally {
-      clearIsAuthenticated();
-      router.replace("/sign-in");
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    async function syncAuth() {
+      try {
+        const me = await getMe();
+
+        if (!me) {
+          clearIsAuthenticated();
+        }
+      } finally {
+        setCheckingAuth(false);
+      }
     }
-  }
+
+    syncAuth();
+  }, [clearIsAuthenticated]);
 
   const isActive = (href: string) => (pathname === href ? "page" : undefined);
+
+  if (checkingAuth) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return (
@@ -54,6 +68,15 @@ export default function AuthNavigation() {
     );
   }
 
+  async function handleLogout() {
+    try {
+      await logout();
+    } finally {
+      clearIsAuthenticated();
+      router.replace("/sign-in");
+    }
+  }
+
   return (
     <>
       <li className={css.navigationItem}>
@@ -67,15 +90,15 @@ export default function AuthNavigation() {
         </Link>
       </li>
       <li className={css.navigationItem}>
-  <Link
-    href="/notes/filter/all"
-    prefetch={false}
-    aria-current={isActive("/notes/filter/all")}
-    className={css.navigationLink}
-  >
-    Notes
-  </Link>
-</li>
+        <Link
+          href="/notes/filter/all"
+          prefetch={false}
+          aria-current={isActive("/notes/filter/all")}
+          className={css.navigationLink}
+        >
+          Notes
+        </Link>
+      </li>
       <li className={css.navigationItem}>
         <p className={css.userEmail}>{user?.email}</p>
         <button
