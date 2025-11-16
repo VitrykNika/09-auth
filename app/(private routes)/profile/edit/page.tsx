@@ -58,10 +58,7 @@ export default function EditProfile() {
     }
 
     try {
-      const updatedUser = await updateProfile({
-        email: user.email,
-        username,
-      });
+      const updatedUser = await updateProfile({ username });
       
       setUser(updatedUser);
 

@@ -64,34 +64,23 @@ export const checkSession = async (): Promise<User | null> => {
   return null;
 };
 
-export const updateMe = async (
-  editUser: Pick<User, "email" | "username">
+export const updateProfile = async (
+  payload: Pick<User, "username">
 ): Promise<User> => {
-  const { data } = await nextServer.patch<User>("/users/me", editUser);
+  const { data } = await nextServer.patch<User>("/users/me", payload);
   return data;
 };
 
 export async function getMe(): Promise<User | null> {
   try {
     const res = await nextServer.get<User | "">("/users/me");
+
     if (res.data && typeof res.data === "object") {
       return res.data as User;
     }
+
     return null;
   } catch {
     return null;
   }
 }
-
-export async function getSession(): Promise<{ success: boolean }> {
-  const { data } = await nextServer.get<{ success: boolean }>(
-    "/auth/session"
-  );
-  return data;
-}
-
-export async function logoutRequest(): Promise<void> {
-  await nextServer.post("/auth/logout");
-}
-
-export const updateProfile = updateMe;
